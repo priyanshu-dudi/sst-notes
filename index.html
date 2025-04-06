@@ -1,57 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📚 Student Notes</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Arial", sans-serif; }
-        body { background: linear-gradient(135deg, #0a0a0a, #1c1c1c); color: white; text-align: center; padding: 20px; }
-        header { background: #ff9800; padding: 15px; font-size: 24px; font-weight: bold; border-radius: 10px; }
-        .container { max-width: 900px; margin: 30px auto; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; box-shadow: 0 4px 10px rgba(255,165,0,0.3); }
-        .note { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.2); padding: 15px; margin: 10px 0; border-radius: 8px; transition: 0.3s; }
-        .note:hover { background: rgba(255,255,255,0.3); transform: scale(1.02); }
-        .note a { background: #ff9800; color: black; padding: 8px 14px; text-decoration: none; border-radius: 6px; transition: 0.3s; font-weight: bold; }
-        .note a:hover { background: #ff6600; }
-        footer { margin-top: 30px; color: #bbb; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📚 Student Notes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Arial", sans-serif; }
+    body { background: linear-gradient(135deg, #0a0a0a, #1c1c1c); color: rgb(0, 0, 0); text-align: center; padding: 20px; }
+
+    /* Hide main content initially */
+    #main-content { display: none; }
+
+    /* Loading screen */
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgb(255, 255, 255);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    header { background: #ff9800; padding: 15px; font-size: 24px; font-weight: bold; border-radius: 10px; }
+    .container { max-width: 900px; margin: 30px auto; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; box-shadow: 0 4px 10px rgba(255,165,0,0.3); }
+    .note { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.2); padding: 15px; margin: 10px 0; border-radius: 8px; transition: 0.3s; }
+    .note:hover { background: rgba(255,255,255,0.3); transform: scale(1.02); }
+    .note a { background: #ff9800; color: black; padding: 8px 14px; text-decoration: none; border-radius: 6px; transition: 0.3s; font-weight: bold; }
+    .note a:hover { background: #ff6600; }
+    footer { margin-top: 30px; color: #bbb; }
+  </style>
 </head>
 <body>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <img src="download.png" alt="Loading Logo" />
+    <h2>Loading your notes...</h2>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
     <header>📚 Student Notes Library</header>
     <div class="container" id="notesContainer">Loading notes...</div>
     <footer>&copy; 2025 Notes Library by Priyanshu</footer>
+  </div>
 
-    <script>
-        const username = "priyanshu-dudi";
-        const repo = "sst-notes";
-        const folderPath = "notes";
-        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${folderPath}`;
+  <script>
+    // Hide loading screen after 5 seconds
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+    }, 5000);
 
-        fetch(apiUrl)
-            .then(res => res.json())
-            .then(files => {
-                const container = document.getElementById('notesContainer');
-                container.innerHTML = '';
-                files.forEach(file => {
-                    if (file.type === 'file') {
-                        const div = document.createElement('div');
-                        div.className = 'note';
-                        const name = document.createElement('div');
-                        name.textContent = file.name;
-                        const link = document.createElement('a');
-                        link.href = file.download_url;
-                        link.download = file.name;
-                        link.textContent = "Download";
-                        div.appendChild(name);
-                        div.appendChild(link);
-                        container.appendChild(div);
-                    }
-                });
-            })
-            .catch(error => {
-                document.getElementById('notesContainer').innerHTML = "<p>⚠️ Failed to load notes.</p>";
-                console.error("Error:", error);
-            });
-    </script>
+    // Load notes from GitHub
+    const username = "priyanshu-dudi";
+    const repo = "sst-notes";
+    const folderPath = "notes";
+    const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${folderPath}`;
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(files => {
+        const container = document.getElementById('notesContainer');
+        container.innerHTML = '';
+        files.forEach(file => {
+          if (file.type === 'file') {
+            const div = document.createElement('div');
+            div.className = 'note';
+            const name = document.createElement('div');
+            name.textContent = file.name;
+            const link = document.createElement('a');
+            link.href = file.download_url;
+            link.download = file.name;
+            link.textContent = "Download";
+            div.appendChild(name);
+            div.appendChild(link);
+            container.appendChild(div);
+          }
+        });
+      })
+      .catch(error => {
+        document.getElementById('notesContainer').innerHTML = "<p>⚠️ Failed to load notes.</p>";
+        console.error("Error:", error);
+      });
+  </script>
 </body>
 </html>
